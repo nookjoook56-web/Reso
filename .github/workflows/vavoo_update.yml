@@ -1,0 +1,31 @@
+    - name: Vavoo Listesini Guncelle
+      run: |
+        python - <<EOF
+        import cloudscraper
+        import os
+
+        file_path = "playlist.m3u"
+        proxy_base = "https://backdor-proxy.onrender.com/proxy?link="
+        url = "https://vjackson.info/live/index?output=json"
+        
+        scraper = cloudscraper.create_scraper()
+        try:
+            response = scraper.get(url, timeout=45)
+            if response.status_code == 200:
+                channels = response.json()
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write("#EXTM3U\n")
+                    count = 0
+                    for ch in channels:
+                        if ch.get('group') == 'Turkey':
+                            name = ch.get('name', 'Kanal')
+                            ch_url = ch.get('url')
+                            f.write(f'#EXTINF:-1 group-title="Vavoo-TR",{name}\n')
+                            f.write(f"{proxy_base}{ch_url}\n")
+                            count += 1
+                print(f"Bitti: {count} kanal.")
+            else:
+                print(f"Hata: {response.status_code}")
+        except Exception as e:
+            print(f"Hata: {e}")
+        EOF
