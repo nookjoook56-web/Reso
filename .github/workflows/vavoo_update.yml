@@ -54,7 +54,13 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add playlist.m3u
-          git commit -m "Vavoo listesi guncellendi" || echo "Degisiklik yok"
-          git push origin main
+          
+          if [ -f "playlist.m3u" ]; then
+            git add playlist.m3u
+            git commit -m "Vavoo listesi guncellendi" || echo "Degisiklik yok"
+            git push origin main
+          else
+            echo "HATA: playlist.m3u dosyasi bulunamadi!"
+            exit 1
+          fi
           
