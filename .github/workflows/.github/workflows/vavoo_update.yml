@@ -1,24 +1,22 @@
-name: Vavoo Guncelleyici
+name: Vavoo Otomatik Guncelleyici
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch:
+    - cron: '0 */6 * * *' # Her 6 saatte bir calisir
+  workflow_dispatch: # Manuel baslatma butonu ekler
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v3
 
-      - name: Python Kur ve Kutuphaneleri Yukle
+      - name: Python ve Kutuphaneleri Kur
         run: |
           python -m pip install --upgrade pip
           pip install cloudscraper requests
 
-      - name: Kanal Listesini Olustur
+      - name: Kanallari Vavoo'dan Cek
         run: |
           python - <<EOF
           import cloudscraper
@@ -37,30 +35,28 @@ jobs:
                       f.write("#EXTM3U\n")
                       count = 0
                       for ch in channels:
-                          if ch.get('group') == 'Turkey':
+                          # Hem Turkiye hem de Spor kanallarini filtrele
+                          group = ch.get('group', '')
+                          if group in ['Turkey', 'Spain', 'Germany']: # Beinsportlar genellikle bu gruplardadir
                               name = ch.get('name', 'Kanal')
                               ch_url = ch.get('url')
-                              f.write(f'#EXTINF:-1 group-title="Vavoo-TR",{name}\n')
-                              f.write(f"{proxy_base}{ch_url}\n")
-                              count += 1
+                              # Sadece Beinsport icerenleri veya TR kanallarini al
+                              if "Bein" in name or group == 'Turkey':
+                                  f.write(f'#EXTINF:-1 group-title="{group}",{name}\n')
+                                  f.write(f"{proxy_base}{ch_url}\n")
+                                  count += 1
                   print(f"Basarili: {count} kanal eklendi.")
               else:
-                  print(f"Sunucu Hatasi: {response.status_code}")
+                  print(f"Hata: {response.status_code}")
           except Exception as e:
               print(f"Hata: {e}")
           EOF
 
-      - name: GitHub'a Yukle
+      - name: Degisiklikleri Kaydet
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          
-          if [ -f "playlist.m3u" ]; then
-            git add playlist.m3u
-            git commit -m "Vavoo listesi guncellendi" || echo "Degisiklik yok"
-            git push origin main
-          else
-            echo "HATA: playlist.m3u dosyasi bulunamadi!"
-            exit 1
-          fi
+          git add playlist.m3u
+          git commit -m "Otomatik Vavoo & Beinsport Guncellemesi" || exit 0
+          git push origin main
           
