@@ -1,0 +1,9 @@
+#EXTM3U
+#EXTINF:-1 group-title="Vavoo-TR",TR: TRT 1 HD
+https://backdor-proxy.onrender.com/proxy?link=http://vavoo.to/live/TRT1.m3u8
+#EXTINF:-1 group-title="Vavoo-TR",TR: ATV HD
+https://backdor-proxy.onrender.com/proxy?link=http://vavoo.to/live/ATV.m3u8
+#EXTINF:-1 group-title="Vavoo-TR",TR: KANAL D HD
+https://backdor-proxy.onrender.com/proxy?link=http://vavoo.to/live/KanalD.m3u8
+#EXTINF:-1 group-title="Vavoo-TR",TR: STAR TV HD
+https://backdor-proxy.onrender.com/proxy?link=http://vavoo.to/live/StarTV.m3u8
