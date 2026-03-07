@@ -1,3 +1,26 @@
+name: Vavoo Otomatik Guncelleyici
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Python Kur ve Kutuphaneleri Yukle
+        run: |
+          python -m pip install --upgrade pip
+          pip install cloudscraper requests
+
+      - name: Kanal Listesini Olustur
+        run: |
+          python - <<EOF
           import cloudscraper
           import os
 
@@ -18,7 +41,7 @@
                           group = ch.get('group', '')
                           ch_url = ch.get('url', '')
                           
-                          # FİLTRE: Türkiye kanalları VEYA isminde "BEIN" geçen her şey
+                          # Filtre: Türkiye kanalları veya isminde BEIN/SPOR geçenler
                           if group == 'Turkey' or "BEIN" in name or "SPOR" in name:
                               f.write(f'#EXTINF:-1 group-title="{group}",{ch.get("name")}\n')
                               f.write(f"{proxy_base}{ch_url}\n")
@@ -27,5 +50,15 @@
               else:
                   print(f"Sunucu Hatasi: {response.status_code}")
           except Exception as e:
-              print(f"Hata olustu: {e}")
-              
+              print(f"Hata: {e}")
+          EOF
+
+      - name: GitHub'a Yukle
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          if [ -f playlist.m3u ]; then
+            git add playlist.m3u
+            git commit -m "Vavoo & Beinsport listesi guncellendi" || exit 0
+            git push origin main
+          fi
