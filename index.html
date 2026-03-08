@@ -2,40 +2,51 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Reso IPTV Kanal Listesi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reso IPTV Sistemi</title>
     <style>
-        body { background-color: #121212; color: #e0e0e0; font-family: sans-serif; text-align: center; }
-        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
-        th, td { border: 1px solid #333; padding: 12px; text-align: left; }
-        th { background-color: #1f1f1f; color: #ffeb3b; }
-        tr:nth-child(even) { background-color: #1a1a1a; }
-        .btn { padding: 5px 10px; background: #f44336; color: white; text-decoration: none; border-radius: 3px; }
+        body { background-color: #0d0d0d; color: #fff; font-family: 'Segoe UI', sans-serif; padding: 15px; }
+        h2 { color: #ff3333; text-transform: uppercase; letter-spacing: 2px; border-left: 5px solid #ff3333; padding-left: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #1a1a1a; color: #f1c40f; padding: 12px; font-size: 14px; text-transform: uppercase; }
+        td { padding: 10px; border-bottom: 1px solid #222; font-size: 13px; }
+        .play-btn { background: linear-gradient(45deg, #ff3333, #b30000); color: white; padding: 5px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; }
+        #loading { color: #f1c40f; text-align: center; padding: 20px; }
     </style>
 </head>
 <body>
-    <h2>Reso Merkezi Sistem - Kanal Listesi</h2>
-    <p>Son Güncelleme: Sun Mar  8 06:22:20 +03 2026</p>
-    <table id="kanalTablo">
+    <h2>Reso Merkezi Sistem</h2>
+    <div id="loading">Kanallar yükleniyor, lütfen bekleyin...</div>
+    <table id="targetTable" style="display:none;">
         <thead>
             <tr>
                 <th>Grup</th>
-                <th>Kanal Adı</th>
+                <th>Kanal</th>
                 <th>İşlem</th>
             </tr>
         </thead>
-        <tbody>
-            </tbody>
+        <tbody></tbody>
     </table>
+
     <script>
         fetch('kanallar.json')
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                const tbody = document.querySelector('#kanalTablo tbody');
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('targetTable').style.display = 'table';
+                const tbody = document.querySelector('#targetTable tbody');
                 data.forEach(item => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${item.group}</td><td>${item.name}</td><td><a href="${item.url}" class="btn">Oynat</a></td>`;
+                    tr.innerHTML = `
+                        <td>${item.group || 'Vavoo'}</td>
+                        <td>${item.name}</td>
+                        <td><a href="${item.url}" class="play-btn">İZLE</a></td>
+                    `;
                     tbody.appendChild(tr);
                 });
+            })
+            .catch(err => {
+                document.getElementById('loading').innerText = 'Hata: Veri dosyası boş veya bozuk!';
             });
     </script>
 </body>
