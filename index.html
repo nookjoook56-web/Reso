@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Reso IPTV Kanal Listesi</title>
+    <style>
+        body { background-color: #121212; color: #e0e0e0; font-family: sans-serif; text-align: center; }
+        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
+        th, td { border: 1px solid #333; padding: 12px; text-align: left; }
+        th { background-color: #1f1f1f; color: #ffeb3b; }
+        tr:nth-child(even) { background-color: #1a1a1a; }
+        .btn { padding: 5px 10px; background: #f44336; color: white; text-decoration: none; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h2>Reso Merkezi Sistem - Kanal Listesi</h2>
+    <p>Son Güncelleme: Sun Mar  8 06:22:20 +03 2026</p>
+    <table id="kanalTablo">
+        <thead>
+            <tr>
+                <th>Grup</th>
+                <th>Kanal Adı</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+    <script>
+        fetch('kanallar.json')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('#kanalTablo tbody');
+                data.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${item.group}</td><td>${item.name}</td><td><a href="${item.url}" class="btn">Oynat</a></td>`;
+                    tbody.appendChild(tr);
+                });
+            });
+    </script>
+</body>
+</html>
