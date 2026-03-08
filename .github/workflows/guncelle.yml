@@ -1,0 +1,33 @@
+name: Otomatik Kanal Guncelleme
+on:
+  schedule:
+    - cron: '0 0 * * *' # Her gece 00:00'da calisir
+  workflow_dispatch: # Manuel baslatma butonu ekler
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Depoyu Cek
+        uses: actions/checkout@v3
+
+      - name: Python Kur
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Bağımlılıkları Kur
+        run: pip install requests cloudscraper
+
+      - name: Kanalları Güncelle
+        run: |
+          python vavoo_get.py --json > kanallar.json
+          python donusturucu.py # Eğer m3u dönüşümü yapıyorsa
+
+      - name: Değişiklikleri Kaydet
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Otomatik guncelleme: $(date)" || exit 0
+          git push
